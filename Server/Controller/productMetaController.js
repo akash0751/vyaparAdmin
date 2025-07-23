@@ -1,10 +1,10 @@
 // controllers/productMetaController.js
 const ProductMeta =require( "../Model/productMeta");
-
+const Product = require("../Model/product");
 const getAllProductMeta = async (req, res) => {
   try {
     const metaList = await ProductMeta.find()
-      .populate("product", "title")   
+      .populate("product", "title")       // Only get product title // Optional: for admin info
 
     res.status(200).json({ success: true, meta: metaList });
   } catch (error) {
@@ -17,7 +17,18 @@ const getAllProductMeta = async (req, res) => {
 const addProductMeta = async (req, res) => {
   try {
     const { product, manufactureDate, expiryDate, deliveryDate, deliveryTime } = req.body;
-    const addedBy = req.user.id; // Ensure you're using auth middleware to set req.user
+    const addedBy = req.user.id;
+
+    // ✅ Check if product is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(product)) {
+      return res.status(400).json({ success: false, error: "Invalid product ID." });
+    }
+
+    // ✅ Check if product exists
+    const existingProduct = await Product.findById(product);
+    if (!existingProduct) {
+      return res.status(404).json({ success: false, error: "Product not found." });
+    }
 
     const newMeta = new ProductMeta({
       product,
@@ -30,6 +41,7 @@ const addProductMeta = async (req, res) => {
 
     const savedMeta = await newMeta.save();
     res.status(201).json({ success: true, meta: savedMeta });
+
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
