@@ -16,28 +16,28 @@ const AddProductMeta = () => {
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
   const api = import.meta.env.VITE_API_URL;
+  const token = localStorage.getItem('adminToken');
 
   useEffect(() => {
-    const token = localStorage.getItem('adminToken');
     if (!token) return navigate('/');
-
     try {
       const decoded = jwtDecode(token);
       if (decoded.role !== 'admin') return navigate('/');
-      fetchProducts(token);
+      fetchProducts();
     } catch {
       navigate('/');
     }
   }, []);
 
-  const fetchProducts = async (token) => {
+  const fetchProducts = async () => {
     try {
       const res = await adminAxiosInstance.get(`${api}/api/products`, {
-        headers: { authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
       setProducts(res.data.product);
     } catch (err) {
-      console.error('Error fetching products', err);
+      console.error('Error fetching products:', err);
+      setErrorMsg('Failed to fetch product list');
     }
   };
 
@@ -47,60 +47,116 @@ const AddProductMeta = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('adminToken');
+
+    if (!formData.product) {
+      setErrorMsg('Please select a product');
+      return;
+    }
+
     try {
-      await adminAxiosInstance.post(`${api}/api/addMeta`, formData, {
-        headers: { authorization: `Bearer ${token}` },
+      const res = await adminAxiosInstance.post(`${api}/api/addMeta`, formData, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      setSuccessMsg('Product metadata added successfully!');
-      setFormData({ product: '', manufactureDate: '', expiryDate: '', deliveryDate: '', deliveryTime: '' });
-      setTimeout(() => setSuccessMsg(''), 2000);
+      if (res.data.success) {
+        setSuccessMsg('Product metadata added successfully!');
+        setFormData({
+          product: '',
+          manufactureDate: '',
+          expiryDate: '',
+          deliveryDate: '',
+          deliveryTime: '',
+        });
+      }
     } catch (err) {
-      console.error('Error adding product meta', err);
-      setErrorMsg('Failed to add product meta');
-      setTimeout(() => setErrorMsg(''), 2000);
+      console.error('Error adding product metadata:', err);
+      const errMsg =
+        err?.response?.data?.error || 'Failed to add product metadata';
+      setErrorMsg(errMsg);
+    } finally {
+      setTimeout(() => {
+        setSuccessMsg('');
+        setErrorMsg('');
+      }, 3000);
     }
   };
 
   return (
-    <div className="add-meta-container">
+    <div className="container mt-5">
       <h2>Add Product Metadata</h2>
 
       {successMsg && <div className="alert alert-success">{successMsg}</div>}
       {errorMsg && <div className="alert alert-danger">{errorMsg}</div>}
 
-      <form className="meta-form" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Product</label>
-          <select name="product" value={formData.product} onChange={handleChange} required className="form-control">
+      <form onSubmit={handleSubmit} className="mt-4">
+        <div className="mb-3">
+          <label className="form-label">Product</label>
+          <select
+            name="product"
+            value={formData.product}
+            onChange={handleChange}
+            required
+            className="form-select"
+          >
             <option value="">Select Product</option>
             {products.map((p) => (
-              <option key={p._id} value={p._id}>{p.title}</option>
+              <option key={p._id} value={p._id}>
+                {p.title}
+              </option>
             ))}
           </select>
         </div>
 
-        <div className="form-group">
-          <label>Manufacture Date</label>
-          <input type="date" name="manufactureDate" value={formData.manufactureDate} onChange={handleChange} required className="form-control" />
+        <div className="mb-3">
+          <label className="form-label">Manufacture Date</label>
+          <input
+            type="date"
+            name="manufactureDate"
+            value={formData.manufactureDate}
+            onChange={handleChange}
+            required
+            className="form-control"
+          />
         </div>
 
-        <div className="form-group">
-          <label>Expiry Date</label>
-          <input type="date" name="expiryDate" value={formData.expiryDate} onChange={handleChange} required className="form-control" />
+        <div className="mb-3">
+          <label className="form-label">Expiry Date</label>
+          <input
+            type="date"
+            name="expiryDate"
+            value={formData.expiryDate}
+            onChange={handleChange}
+            required
+            className="form-control"
+          />
         </div>
 
-        <div className="form-group">
-          <label>Delivery Date</label>
-          <input type="date" name="deliveryDate" value={formData.deliveryDate} onChange={handleChange} required className="form-control" />
+        <div className="mb-3">
+          <label className="form-label">Delivery Date</label>
+          <input
+            type="date"
+            name="deliveryDate"
+            value={formData.deliveryDate}
+            onChange={handleChange}
+            required
+            className="form-control"
+          />
         </div>
 
-        <div className="form-group">
-          <label>Delivery Time</label>
-          <input type="time" name="deliveryTime" value={formData.deliveryTime} onChange={handleChange} required className="form-control" />
+        <div className="mb-3">
+          <label className="form-label">Delivery Time</label>
+          <input
+            type="time"
+            name="deliveryTime"
+            value={formData.deliveryTime}
+            onChange={handleChange}
+            required
+            className="form-control"
+          />
         </div>
 
-        <button type="submit" className="btn btn-primary mt-3">Add Metadata</button>
+        <button type="submit" className="btn btn-primary">
+          Add Metadata
+        </button>
       </form>
     </div>
   );
