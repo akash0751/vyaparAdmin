@@ -4,12 +4,16 @@ const ProductMeta =require( "../Model/productMeta");
 const getAllProductMeta = async (req, res) => {
   try {
     const metaList = await ProductMeta.find()
-    res.json({meta:metaList})
+      .populate("product", "title")       // Only get product title
+      .populate("addedBy", "name email"); // Optional: for admin info
+
+    res.status(200).json({ success: true, meta: metaList });
   } catch (error) {
     console.error("Error in getAllProductMeta:", error);
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
 // Create metadata entry
 const addProductMeta = async (req, res) => {
   try {

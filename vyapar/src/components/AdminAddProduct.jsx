@@ -136,10 +136,7 @@ const AdminAddProduct = () => {
             <header>
                 <nav className="navbar">
                     <div className="navbar-brand">CORE FOUR / Admin</div>
-                    <div className="navbar-search">
-                        <input type="text" placeholder="Search for grocery, vegetables, spices..." className="search-input" />
-                        <FaSearch className="search-icon" />
-                    </div>
+                    
                     <div className="navbar-icons">
                         <FaSignOutAlt onClick={handleLogout} className="logout-icon" title="Logout" />
                     </div>

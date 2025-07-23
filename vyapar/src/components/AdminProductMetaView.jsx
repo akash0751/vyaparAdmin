@@ -92,7 +92,7 @@ const token = localStorage.getItem('adminToken');
             {metaList.map(meta => (
               editMeta && editMeta._id === meta._id ? (
                 <tr key={meta._id}>
-                  <td>{meta.product.title}</td>
+                  <td>{meta.product?.title}</td>
                   <td><input type="date" name="manufactureDate" value={editMeta.manufactureDate.slice(0, 10)} onChange={handleEditChange} className="form-control" /></td>
                   <td><input type="date" name="expiryDate" value={editMeta.expiryDate.slice(0, 10)} onChange={handleEditChange} className="form-control" /></td>
                   <td><input type="date" name="deliveryDate" value={editMeta.deliveryDate.slice(0, 10)} onChange={handleEditChange} className="form-control" /></td>
