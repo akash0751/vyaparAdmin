@@ -1,93 +1,165 @@
-// controllers/productMetaController.js
-const ProductMeta =require( "../Model/productMeta");
-const Product = require("../Model/product");
-const getAllProductMeta = async (req, res) => {
-  try {
-    const metaList = await ProductMeta.find()
-      .populate("product", "title")       // Only get product title // Optional: for admin info
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+import adminAxiosInstance from '../utils/adminAxiosInstance';
 
-    res.status(200).json({ success: true, meta: metaList });
-  } catch (error) {
-    console.error("Error in getAllProductMeta:", error);
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
+const AddProductMeta = () => {
+  const [products, setProducts] = useState([]);
+  const [formData, setFormData] = useState({
+    product: '',
+    manufactureDate: '',
+    expiryDate: '',
+    deliveryDate: '',
+    deliveryTime: '',
+  });
+  const [successMsg, setSuccessMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const navigate = useNavigate();
+  const api = import.meta.env.VITE_API_URL;
+  const token = localStorage.getItem('adminToken');
 
-// Create metadata entry
-const addProductMeta = async (req, res) => {
-  try {
-    const { product, manufactureDate, expiryDate, deliveryDate, deliveryTime } = req.body;
-    const addedBy = req.user.id;
+  useEffect(() => {
+    if (!token) return navigate('/');
+    try {
+      const decoded = jwtDecode(token);
+      if (decoded.role !== 'admin') return navigate('/');
+      fetchProducts();
+    } catch {
+      navigate('/');
+    }
+  }, []);
 
-    // ✅ Check if product is a valid ObjectId
-    if (!mongoose.Types.ObjectId.isValid(product)) {
-      return res.status(400).json({ success: false, error: "Invalid product ID." });
+  const fetchProducts = async () => {
+    try {
+      const res = await adminAxiosInstance.get(`${api}/api/products`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setProducts(res.data.product);
+    } catch (err) {
+      console.error('Error fetching products:', err);
+      setErrorMsg('Failed to fetch product list');
+    }
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!formData.product) {
+      setErrorMsg('Please select a product');
+      return;
     }
 
-    // ✅ Check if product exists
-    const existingProduct = await Product.findById(product);
-    if (!existingProduct) {
-      return res.status(404).json({ success: false, error: "Product not found." });
+    try {
+      const res = await adminAxiosInstance.post(`${api}/api/addMeta`, formData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.data.success) {
+        setSuccessMsg('Product metadata added successfully!');
+        setFormData({
+          product: '',
+          manufactureDate: '',
+          expiryDate: '',
+          deliveryDate: '',
+          deliveryTime: '',
+        });
+      }
+    } catch (err) {
+      console.error('Error adding product metadata:', err);
+      const errMsg =
+        err?.response?.data?.error || 'Failed to add product metadata';
+      setErrorMsg(errMsg);
+    } finally {
+      setTimeout(() => {
+        setSuccessMsg('');
+        setErrorMsg('');
+      }, 3000);
     }
+  };
 
-    const newMeta = new ProductMeta({
-      product,
-      addedBy,
-      manufactureDate,
-      expiryDate,
-      deliveryDate,
-      deliveryTime,
-    });
+  return (
+    <div className="container mt-5">
+      <h2>Add Product Metadata</h2>
 
-    const savedMeta = await newMeta.save();
-    res.status(201).json({ success: true, meta: savedMeta });
+      {successMsg && <div className="alert alert-success">{successMsg}</div>}
+      {errorMsg && <div className="alert alert-danger">{errorMsg}</div>}
 
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
+      <form onSubmit={handleSubmit} className="mt-4">
+        <div className="mb-3">
+          <label className="form-label">Product</label>
+          <select
+            name="product"
+            value={formData.product}
+            onChange={handleChange}
+            required
+            className="form-select"
+          >
+            <option value="">Select Product</option>
+            {products.map((p) => (
+              <option key={p._id} value={p._id}>
+                {p.title}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Manufacture Date</label>
+          <input
+            type="date"
+            name="manufactureDate"
+            value={formData.manufactureDate}
+            onChange={handleChange}
+            required
+            className="form-control"
+          />
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Expiry Date</label>
+          <input
+            type="date"
+            name="expiryDate"
+            value={formData.expiryDate}
+            onChange={handleChange}
+            required
+            className="form-control"
+          />
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Delivery Date</label>
+          <input
+            type="date"
+            name="deliveryDate"
+            value={formData.deliveryDate}
+            onChange={handleChange}
+            required
+            className="form-control"
+          />
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Delivery Time</label>
+          <input
+            type="time"
+            name="deliveryTime"
+            value={formData.deliveryTime}
+            onChange={handleChange}
+            required
+            className="form-control"
+          />
+        </div>
+
+        <button type="submit" className="btn btn-primary">
+          Add Metadata
+        </button>
+      </form>
+    </div>
+  );
 };
 
-// Get metadata for a product
-const getProductMeta = async (req, res) => {
-  try {
-    const { productId } = req.params;
-
-    const meta = await ProductMeta.findOne({ product: productId }).populate("product addedBy");
-    if (!meta) return res.status(404).json({ message: "Metadata not found" });
-
-    res.json({ success: true, meta });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-};
-
-// Update metadata
-const updateProductMeta = async (req, res) => {
-  try {
-    const { id } = req.params; // meta ID
-    const updates = req.body;
-
-    const updatedMeta = await ProductMeta.findByIdAndUpdate(id, updates, { new: true });
-    if (!updatedMeta) return res.status(404).json({ message: "Metadata not found" });
-
-    res.json({ success: true, meta: updatedMeta });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-};
-
-// Delete metadata
-const deleteProductMeta = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const deleted = await ProductMeta.findByIdAndDelete(id);
-    if (!deleted) return res.status(404).json({ message: "Metadata not found" });
-
-    res.json({ success: true, message: "Metadata deleted" });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-};
-
-module.exports = {getAllProductMeta,addProductMeta, getProductMeta, updateProductMeta, deleteProductMeta}
+export default AddProductMeta;

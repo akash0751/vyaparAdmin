@@ -25,7 +25,7 @@ const token = localStorage.getItem('adminToken');
 
   const fetchMeta = async () => {
     try {
-      const res = await adminAxiosInstance.get(`${api}/api`, {
+      const res = await adminAxiosInstance.get(`${api}/api/all`, {
         headers: { authorization: `Bearer ${token}` },
       });
       setMetaList(res.data.meta);
@@ -37,7 +37,7 @@ const token = localStorage.getItem('adminToken');
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this metadata?")) return;
     try {
-      await adminAxiosInstance.delete(`${api}/api/productMeta/${id}`, {
+      await adminAxiosInstance.delete(`${api}/api/${id}`, {
         headers: { authorization: `Bearer ${localStorage.getItem('adminToken')}` },
       });
       setSuccess('Metadata deleted');
@@ -56,7 +56,7 @@ const token = localStorage.getItem('adminToken');
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      await adminAxiosInstance.put(`${api}/api/productMeta/${editMeta._id}`, editMeta, {
+      await adminAxiosInstance.put(`${api}/api/${editMeta._id}`, editMeta, {
         headers: { authorization: `Bearer ${localStorage.getItem('adminToken')}` },
       });
       setSuccess('Metadata updated');
