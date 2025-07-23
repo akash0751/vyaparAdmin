@@ -16,7 +16,7 @@ const app = express();
 
 // CORS Configuration
 app.use(cors({
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173","https://vyapar-admin.vercel.app"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
 }));
