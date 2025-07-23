@@ -71,7 +71,7 @@ const AdminAddProduct = () => {
     setDescription('');
     setImage(null);
     setShopStocks([{ shopName: '', quantity: '', unit: 'kg' }]);
-    document.getElementById('image')?.value = '';
+    
   };
 
   const handleAddProduct = async (e) => {
