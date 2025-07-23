@@ -7,7 +7,7 @@ const getAllProductMeta = async (req, res) => {
     const metaList = await ProductMeta.aggregate([
       {
         $lookup: {
-          from: "products", // MongoDB collection name — always lowercase & plural
+          from: "products",
           localField: "product",
           foreignField: "_id",
           as: "productInfo"
@@ -16,18 +16,20 @@ const getAllProductMeta = async (req, res) => {
       {
         $unwind: {
           path: "$productInfo",
-          preserveNullAndEmptyArrays: true // handle missing product gracefully
+          preserveNullAndEmptyArrays: true
         }
       },
       {
         $project: {
           _id: 1,
-          size: 1,
-          color: 1,
-          stock: 1,
-          price: 1,
           product: 1,
-          productTitle: "$productInfo.title"
+          productTitle: "$productInfo.title",
+          manufactureDate: 1,
+          expiryDate: 1,
+          deliveryDate: 1,
+          deliveryTime: 1,
+          addedBy: 1,
+          createdAt: 1
         }
       }
     ]);
@@ -38,6 +40,7 @@ const getAllProductMeta = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
 
 
 // Create metadata entry

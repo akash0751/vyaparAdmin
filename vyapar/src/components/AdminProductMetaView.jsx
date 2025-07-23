@@ -102,9 +102,9 @@ const token = localStorage.getItem('adminToken');
               editMeta && editMeta._id === meta._id ? (
                 <tr key={meta._id}>
                   <td>{meta.productTitle || "N/A"}</td>
-                  <td><input type="date" name="manufactureDate" value={editMeta.manufactureDate.slice(0, 10)} onChange={handleEditChange} className="form-control" /></td>
-                  <td><input type="date" name="expiryDate" value={editMeta.expiryDate.slice(0, 10)} onChange={handleEditChange} className="form-control" /></td>
-                  <td><input type="date" name="deliveryDate" value={editMeta.deliveryDate.slice(0, 10)} onChange={handleEditChange} className="form-control" /></td>
+                  <td><input type="date" name="manufactureDate" value={editMeta.manufactureDate} onChange={handleEditChange} className="form-control" /></td>
+                  <td><input type="date" name="expiryDate" value={editMeta.expiryDate} onChange={handleEditChange} className="form-control" /></td>
+                  <td><input type="date" name="deliveryDate" value={editMeta.deliveryDate} onChange={handleEditChange} className="form-control" /></td>
                   <td><input type="time" name="deliveryTime" value={editMeta.deliveryTime} onChange={handleEditChange} className="form-control" /></td>
                   <td>
                     <button className="btn btn-success btn-sm me-2" onClick={handleEditSubmit}>Save</button>
