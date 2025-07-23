@@ -1,6 +1,7 @@
 // controllers/productMetaController.js
 const ProductMeta =require( "../Model/productMeta");
 const Product = require("../Model/product");
+const mongoose = require("mongoose");
 const getAllProductMeta = async (req, res) => {
   try {
     const metaList = await ProductMeta.find()
