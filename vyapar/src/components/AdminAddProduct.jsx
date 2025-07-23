@@ -43,7 +43,7 @@ const AdminAddProduct = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
-    navigate("/adminloginpage");
+    navigate("/");
   };
 
   const handleImageChange = (e) => setImage(e.target.files[0]);

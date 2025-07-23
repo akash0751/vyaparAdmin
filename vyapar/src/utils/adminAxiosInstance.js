@@ -29,7 +29,7 @@ adminAxiosInstance.interceptors.response.use(
         return axios(originalRequest);
       } catch{
         localStorage.removeItem("adminToken");
-        window.location.href = "/adminloginpage";
+        window.location.href = "/";
       }
     }
 

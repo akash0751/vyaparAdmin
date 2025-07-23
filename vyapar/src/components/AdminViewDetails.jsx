@@ -7,7 +7,7 @@ const AdminViewDetails = () => {
     const navigate = useNavigate();
    
     const handleLogout = () => {
-        navigate("/adminloginpage"); // Navigate to the signup page on logout
+        navigate("/"); // Navigate to the signup page on logout
     };
 
     return (

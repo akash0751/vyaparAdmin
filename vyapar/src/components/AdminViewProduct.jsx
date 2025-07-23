@@ -182,7 +182,7 @@ const AdminViewProduct = () => {
           <FaSignOutAlt
             className="text-danger ms-3 cursor-pointer"
             size={20}
-            onClick={() => { localStorage.removeItem("adminToken"); navigate("/adminloginpage"); }}
+            onClick={() => { localStorage.removeItem("adminToken"); navigate("/"); }}
             style={{ cursor: 'pointer' }}
           />
         </div>

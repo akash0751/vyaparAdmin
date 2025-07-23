@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import AdminLoginPage from "./components/AdminLoginPage";
+import AdminLoginPage from "./components/";
 import "bootstrap/dist/css/bootstrap.min.css";
 import AdminAddProduct from "./components/AdminAddProduct";
 import AdminViewProduct from "./components/AdminViewProduct";
