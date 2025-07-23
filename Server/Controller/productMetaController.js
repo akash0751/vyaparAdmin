@@ -4,9 +4,7 @@ const Product = require("../Model/product");
 const mongoose = require("mongoose");
 const getAllProductMeta = async (req, res) => {
   try {
-    const metaList = await ProductMeta.find()
-      .populate("product", "title")       // Only get product title // Optional: for admin info
-
+    const metaList = await ProductMeta.find()     // Only get product title // Optional: for admin info
     res.status(200).json({ success: true, meta: metaList });
   } catch (error) {
     console.error("Error in getAllProductMeta:", error);
