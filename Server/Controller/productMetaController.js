@@ -4,13 +4,41 @@ const Product = require("../Model/product");
 const mongoose = require("mongoose");
 const getAllProductMeta = async (req, res) => {
   try {
-    const metaList = await ProductMeta.find()     // Only get product title // Optional: for admin info
+    const metaList = await ProductMeta.aggregate([
+      {
+        $lookup: {
+          from: "products", // MongoDB collection name — always lowercase & plural
+          localField: "product",
+          foreignField: "_id",
+          as: "productInfo"
+        }
+      },
+      {
+        $unwind: {
+          path: "$productInfo",
+          preserveNullAndEmptyArrays: true // handle missing product gracefully
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          size: 1,
+          color: 1,
+          stock: 1,
+          price: 1,
+          product: 1,
+          productTitle: "$productInfo.title"
+        }
+      }
+    ]);
+
     res.status(200).json({ success: true, meta: metaList });
   } catch (error) {
     console.error("Error in getAllProductMeta:", error);
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
 
 // Create metadata entry
 const addProductMeta = async (req, res) => {
