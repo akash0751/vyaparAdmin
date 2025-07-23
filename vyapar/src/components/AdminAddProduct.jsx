@@ -7,7 +7,7 @@ import adminAxiosInstance from '../utils/adminAxiosInstance';
 
 const AdminAddProduct = () => {
     const descriptionRef = useRef(null);
-    const stackRef = useRef(null);
+    // const stackRef = useRef(null);
     const navigate = useNavigate();
 
     const [productName, setProductName] = useState('');
