@@ -1,47 +1,74 @@
 import React, { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { FaSearch, FaSignOutAlt } from 'react-icons/fa';
 import '../styles/AdminHome.css';
-import { FaSearch, FaSignOutAlt } from "react-icons/fa";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const AdminHome = () => {
   const navigate = useNavigate();
 
-  // Check admin login on mount
   useEffect(() => {
-    const adminToken = localStorage.getItem('adminToken'); // Or whatever token/key you use
+    const adminToken = localStorage.getItem('adminToken');
     if (!adminToken) {
       navigate('/');
     }
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem('adminToken'); // Clear token
-    navigate("/");
+    localStorage.removeItem('adminToken');
+    navigate('/');
+  };
+
+  const navOptions = [
+    { label: 'Add Product', path: '/adminproduct' },
+    { label: 'View Product', path: '/adminview' },
+    { label: 'Admin Dashboard', path: '/admin-dashboard' },
+    { label: 'Add Meta Details', path: '/productMeta' },
+    { label: 'Meta Details', path: '/viewMeta' },
+  ];
+
+  const handleBoxClick = (path) => {
+    navigate(path);
   };
 
   return (
-    <div className="home-container">
-      <header>
-        <nav className="navbar">
-          <div className="navbar-brand">CORE FOUR / Admin</div>
-          <div className="navbar-search">
-            <input type="text" placeholder="Search for grocery, vegetables, spices..." className="search-input" />
-            <FaSearch className="search-icon" />
-          </div>
-          <div className="navbar-icons">
-            <FaSignOutAlt onClick={handleLogout} className="logout-icon" title="Logout" />
-          </div>
-        </nav>
-      </header>
-      <main>
-        <div className="button-container">
-          <Link to="/adminproduct" className="button">Add Product</Link>
-          <Link to="/adminview" className="button">View Product</Link>
-          <Link to="/admin-dashboard" className="button">Admin Dashboard</Link>
-          <Link to="/productMeta" className="button">Add Meta Details</Link>
-          <Link to="/viewMeta" className="button">Meta Details</Link>
+    <div className="container-fluid p-3">
+      <nav className="navbar bg-light shadow-sm p-3 rounded d-flex justify-content-between align-items-center mb-4">
+        <span className="navbar-brand fw-bold fs-4 text-primary">CORE FOUR / Admin</span>
+        <div className="d-flex align-items-center gap-2">
+          <input
+            type="text"
+            placeholder="Search for grocery, vegetables, spices..."
+            className="form-control"
+            style={{ width: '300px' }}
+          />
+          <FaSearch className="text-secondary" />
+          <FaSignOutAlt
+            className="text-danger ms-3 cursor-pointer"
+            size={20}
+            onClick={handleLogout}
+            title="Logout"
+            style={{ cursor: 'pointer' }}
+          />
         </div>
-      </main>
+      </nav>
+
+      <div className="row g-4 justify-content-center">
+        {navOptions.map((item, idx) => (
+          <div
+            key={idx}
+            className="col-10 col-sm-6 col-md-4 col-lg-3"
+            onClick={() => handleBoxClick(item.path)}
+            style={{ cursor: 'pointer' }}
+          >
+            <div className="card shadow-sm text-center h-100 p-4 hover-scale">
+              <div className="card-body">
+                <h5 className="card-title text-dark">{item.label}</h5>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
