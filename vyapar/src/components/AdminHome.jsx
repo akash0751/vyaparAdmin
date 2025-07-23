@@ -10,13 +10,13 @@ const AdminHome = () => {
   useEffect(() => {
     const adminToken = localStorage.getItem('adminToken'); // Or whatever token/key you use
     if (!adminToken) {
-      navigate('/adminloginpage');
+      navigate('/');
     }
   }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken'); // Clear token
-    navigate("/adminloginpage");
+    navigate("/");
   };
 
   return (

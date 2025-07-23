@@ -28,19 +28,7 @@ const App = () => {
     <CartProvider>
       <Router>
         <Routes>
-          <Route path="/register" element={<Signup />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/adminsignup" element={<AdminSignup />} />
-          <Route path="/adminloginpage" element={<AdminLoginPage />} />
-          <Route path="/details" element={<Details />} />
-          <Route path="/" element={<Home />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/product/:id" element={<Product />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/OtpVerificationPage" element={<OtpVerificationPage />} />
-          <Route path='/otpVerify' element={<ForgotOtp />} />
-          <Route path='/SetNewPasswordPage' element={<SetNewPasswordPage />} />
-          <Route path="/email" element={<EmailComponent />} />
+          <Route path="/" element={<AdminLoginPage />} />
           <Route path="/adminproduct" element={<AdminAddProduct />} />
           <Route path="/adminview" element={<AdminViewProduct />} />
           <Route path="/adminhome" element={<AdminHome />} />
