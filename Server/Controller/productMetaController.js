@@ -4,8 +4,7 @@ const ProductMeta =require( "../Model/productMeta");
 const getAllProductMeta = async (req, res) => {
   try {
     const metaList = await ProductMeta.find()
-      .populate("product", "title")       // Only get product title
-      .populate("addedBy", "name email"); // Optional: for admin info
+      .populate("product", "title")   
 
     res.status(200).json({ success: true, meta: metaList });
   } catch (error) {
