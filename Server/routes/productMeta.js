@@ -17,7 +17,7 @@ router.post("/addMeta", authenticateJWT, addProductMeta);
 router.get("/all", authenticateJWT, getAllProductMeta);
 
 // Get meta for a specific product by product ID
-router.get("/by-product/:productId", authenticateJWT, getProductMeta);
+router.get("/:productId", authenticateJWT, getProductMeta);
 
 // Update a meta by its ID
 router.put("/:id", authenticateJWT, updateProductMeta);
