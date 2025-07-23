@@ -69,6 +69,15 @@ const token = localStorage.getItem('adminToken');
     }
   };
 
+  const formatDate = (date) => {
+    if (!date) return "";
+    try {
+      return new Date(date).toISOString().slice(0, 10);
+    } catch (err) {
+      return "";
+    }
+  };
+
   return (
     <div className="container mt-5">
       <h2 className="mb-4">Product Metadata</h2>
@@ -105,9 +114,9 @@ const token = localStorage.getItem('adminToken');
               ) : (
                 <tr key={meta._id}>
                   <td>{meta.productTitle || "N/A"}</td>
-                  <td>{new Date(meta.manufactureDate).toLocaleDateString()}</td>
-                  <td>{new Date(meta.expiryDate).toLocaleDateString()}</td>
-                  <td>{new Date(meta.deliveryDate).toLocaleDateString()}</td>
+                  <td>{formatDate(meta.manufactureDate)}</td>
+                <td>{formatDate(meta.expiryDate)}</td>
+                  <td>{formatDate(meta.deliveryDate)}</td>
                   <td>{meta.deliveryTime}</td>
                   <td>
                     <button className="btn btn-primary btn-sm me-2" onClick={() => setEditMeta(meta)}>Edit</button>
