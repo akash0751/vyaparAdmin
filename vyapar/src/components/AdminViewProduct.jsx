@@ -6,11 +6,11 @@ import '../styles/AdminViewProduct.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import adminAxiosInstance from '../utils/adminAxiosInstance';
 
-
-
 const AdminViewProduct = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [editingProductId, setEditingProductId] = useState(null);
   const [editedProduct, setEditedProduct] = useState({
     title: '', description: '', price: '', offerDescription: '', category: '',
@@ -52,9 +52,21 @@ const AdminViewProduct = () => {
         headers: { authorization: `Bearer ${token}` },
       });
       setProducts(res.data.product);
+      setFilteredProducts(res.data.product);
     } catch (error) {
       console.error("Fetch error", error);
     }
+  };
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value.toLowerCase();
+    setSearchTerm(value);
+    const filtered = products.filter((p) =>
+      p.title.toLowerCase().includes(value) ||
+      p.description.toLowerCase().includes(value) ||
+      p.category.toLowerCase().includes(value)
+    );
+    setFilteredProducts(filtered);
   };
 
   const handleEditClick = async (product) => {
@@ -151,68 +163,68 @@ const AdminViewProduct = () => {
   };
 
   return (
-    <div className="home-container">
-      {showSuccessToast && <div className="success-toast">{toastMessage}</div>}
-      {showErrorToast && <div className="error-toast">{toastMessage}</div>}
+    <div className="container-fluid p-4 bg-light min-vh-100">
+      {showSuccessToast && <div className="alert alert-success">{toastMessage}</div>}
+      {showErrorToast && <div className="alert alert-danger">{toastMessage}</div>}
 
-      <header>
-        <nav className="navbar">
-          <div className="navbar-brand">CORE FOUR / Admin</div>
-          <div className="navbar-search">
-            <input type="text" placeholder="Search..." className="search-input" />
-            <FaSearch className="search-icon" />
-          </div>
-          <div className="navbar-icons">
-            <FaSignOutAlt onClick={() => { localStorage.removeItem("adminToken"); navigate("/adminloginpage"); }} className="logout-icon" />
-          </div>
-        </nav>
-      </header>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="text-primary">Admin Product View</h2>
+        <div className="d-flex align-items-center gap-2">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Search products..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            style={{ width: '250px' }}
+          />
+          <FaSearch className="text-secondary" />
+          <FaSignOutAlt
+            className="text-danger ms-3 cursor-pointer"
+            size={20}
+            onClick={() => { localStorage.removeItem("adminToken"); navigate("/adminloginpage"); }}
+            style={{ cursor: 'pointer' }}
+          />
+        </div>
+      </div>
 
-      <main>
-        <aside className="sidebar">
-          <ul>
-            <li><Link to="/adminproduct">Add products</Link></li>
-            <li><Link to="/adminview">View product</Link></li>
-          </ul>
-        </aside>
-
-        <section className="content">
-          <h2>View Products</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Title</th><th>Description</th><th>Price</th><th>Offer</th>
-                <th>Stocks</th><th>Category</th><th>Image</th><th>Actions</th>
+      <div className="table-responsive bg-white shadow rounded p-3">
+        <table className="table table-bordered table-hover align-middle">
+          <thead className="table-primary text-center">
+            <tr>
+              <th>Title</th><th>Description</th><th>Price</th><th>Offer</th>
+              <th>Stocks</th><th>Category</th><th>Image</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredProducts.map((p) => (
+              <tr key={p._id}>
+                <td>{p.title}</td>
+                <td>{p.description}</td>
+                <td>₹{p.price}</td>
+                <td>{p.offerDescription || "-"}</td>
+                <td>
+                  {p.shopStocks?.length ? (
+                    <ul className="list-unstyled mb-0">
+                      {p.shopStocks.map((s, i) => (
+                        <li key={i}>{s.shopName}: {s.quantity} {s.unit}</li>
+                      ))}
+                    </ul>
+                  ) : "-"}
+                </td>
+                <td>{p.category}</td>
+                <td>
+                  <img src={`${api}/uploads/${p.image}`} alt={p.title} width="50" />
+                </td>
+                <td>
+                  <button className="btn btn-sm btn-outline-primary me-1" onClick={() => handleEditClick(p)}>Edit</button>
+                  <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteClick(p._id)}>Delete</button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {products.map((p) => (
-                <tr key={p._id}>
-                  <td>{p.title}</td>
-                  <td>{p.description}</td>
-                  <td>{p.price}</td>
-                  <td>{p.offerDescription}</td>
-                  <td>
-                    {p.shopStocks?.length ? (
-                      <ul className="stock-list">
-                        {p.shopStocks.map((s, i) => (
-                          <li key={i}>{s.shopName}: {s.quantity} {s.unit}</li>
-                        ))}
-                      </ul>
-                    ) : "-"}
-                  </td>
-                  <td>{p.category}</td>
-                  <td><img src={`${api}/uploads/${p.image}`} alt={p.title} width="50" /></td>
-                  <td>
-                    <button onClick={() => handleEditClick(p)}>Edit</button>
-                    <button onClick={() => handleDeleteClick(p._id)}>Delete</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
-      </main>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* Modal */}
       <div className="modal fade" ref={modalRef} tabIndex="-1">
@@ -224,12 +236,24 @@ const AdminViewProduct = () => {
             </div>
             <div className="modal-body">
               <form>
-                <label>Title: <input className="form-control" name="title" value={editedProduct.title} onChange={handleInputChange} /></label>
-                <label>Description: <input className="form-control" name="description" value={editedProduct.description} onChange={handleInputChange} /></label>
-                <label>Price: <input className="form-control" type="number" name="price" value={editedProduct.price} onChange={handleInputChange} /></label>
-                <label>Offer: <input className="form-control" name="offerDescription" value={editedProduct.offerDescription} onChange={handleInputChange} /></label>
-                <label>Category: <input className="form-control" name="category" value={editedProduct.category} onChange={handleInputChange} /></label>
-                <label>Image: <input className="form-control" type="file" onChange={handleFileChange} /></label>
+                <label className="form-label">Title:
+                  <input className="form-control" name="title" value={editedProduct.title} onChange={handleInputChange} />
+                </label>
+                <label className="form-label">Description:
+                  <input className="form-control" name="description" value={editedProduct.description} onChange={handleInputChange} />
+                </label>
+                <label className="form-label">Price:
+                  <input className="form-control" type="number" name="price" value={editedProduct.price} onChange={handleInputChange} />
+                </label>
+                <label className="form-label">Offer:
+                  <input className="form-control" name="offerDescription" value={editedProduct.offerDescription} onChange={handleInputChange} />
+                </label>
+                <label className="form-label">Category:
+                  <input className="form-control" name="category" value={editedProduct.category} onChange={handleInputChange} />
+                </label>
+                <label className="form-label">Image:
+                  <input className="form-control" type="file" onChange={handleFileChange} />
+                </label>
 
                 <h6 className="mt-3">Shop Stocks</h6>
                 {editedProduct.shopStocks?.map((stock, index) => (
@@ -263,4 +287,3 @@ const AdminViewProduct = () => {
 };
 
 export default AdminViewProduct;
-
