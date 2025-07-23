@@ -36,13 +36,7 @@ const AdminHome = () => {
       <nav className="navbar bg-light shadow-sm p-3 rounded d-flex justify-content-between align-items-center mb-4">
         <span className="navbar-brand fw-bold fs-4 text-primary">CORE FOUR / Admin</span>
         <div className="d-flex align-items-center gap-2">
-          <input
-            type="text"
-            placeholder="Search for grocery, vegetables, spices..."
-            className="form-control"
-            style={{ width: '300px' }}
-          />
-          <FaSearch className="text-secondary" />
+          
           <FaSignOutAlt
             className="text-danger ms-3 cursor-pointer"
             size={20}
