@@ -104,7 +104,7 @@ const token = localStorage.getItem('adminToken');
                 </tr>
               ) : (
                 <tr key={meta._id}>
-                  <td>{meta.product.title}</td>
+                  <td>{meta.product?.title}</td>
                   <td>{new Date(meta.manufactureDate).toLocaleDateString()}</td>
                   <td>{new Date(meta.expiryDate).toLocaleDateString()}</td>
                   <td>{new Date(meta.deliveryDate).toLocaleDateString()}</td>
